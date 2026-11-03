@@ -1,0 +1,153 @@
+@import "tailwindcss";
+
+/* Brand tokens. Pure black and white; colour comes only from the drawings and photographs.
+   One tone step (--tone) separates surfaces instead of lines or shadows. */
+:root {
+  --ink: #000000;
+  --paper: #ffffff;
+  --tone: #f2f2f2;
+  --ink-soft: #3d3d3d;
+  --focus: #000000;
+  --bar-h: 3.5rem;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-paper: var(--paper);
+  --color-tone: var(--tone);
+  --color-ink-soft: var(--ink-soft);
+  /* Menu-board colours, sampled from the in-store boards. Used on menu pages only. */
+  --color-mustard: #f0ac22;
+  --color-leaf: #479945;
+  --color-brick: #8f3024;
+  --font-display: var(--font-anton), "Arial Narrow", Impact, sans-serif;
+  --font-body: var(--font-courier-prime), "Courier New", Courier, monospace;
+
+  /* Five-step type scale */
+  --text-s: 0.875rem;      /* 14px: notes, imprint */
+  --text-b: 1.0625rem;     /* 17px: body */
+  --text-l: 1.375rem;      /* 22px: nav, labels, item names */
+  --text-xl: clamp(2.75rem, 7vw, 5.5rem);   /* headings */
+  --text-xxl: clamp(4.5rem, 11vw, 9.5rem);  /* hero and marquee */
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--text-b);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+.display {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  line-height: 0.92;
+  letter-spacing: -0.01em;
+  font-weight: 400;
+}
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+/* Hero line-up: no focus box; the centred, enlarged item is the only cue (owner's call) */
+.lineup-item button:focus-visible {
+  outline: none;
+}
+.on-ink :focus-visible,
+.on-ink:focus-visible {
+  outline-color: var(--paper);
+}
+
+::selection {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+/* Placeholder copy: set apart by a tone step, never by a line */
+.placeholder {
+  background: var(--tone);
+  color: var(--ink);
+  padding: 0.1em 0.35em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+.on-ink .placeholder {
+  background: #262626;
+  color: var(--paper);
+}
+
+/* Horizontal drag rows: native scroll, hidden scrollbar */
+.drag-row {
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+}
+.drag-row::-webkit-scrollbar {
+  display: none;
+}
+
+/* Marquee: transform only, pausable, stopped under reduced motion */
+@keyframes marquee {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+.marquee-track {
+  animation: marquee 32s linear infinite;
+}
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+/* Section entrances: content is visible unless script marks it pending */
+.reveal-item {
+  transition: opacity 700ms var(--ease-out), transform 700ms var(--ease-out);
+  transition-delay: calc(var(--i, 0) * 80ms);
+}
+[data-reveal="pending"] .reveal-item {
+  opacity: 0;
+  transform: translate3d(0, 24px, 0);
+}
+
+/* Press feedback on every control */
+.press {
+  transition: transform 160ms var(--ease-out), background-color 160ms, color 160ms;
+}
+.press:active {
+  transform: scale(0.97);
+}
+
+/* Dialog sheets */
+dialog.sheet {
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+dialog.sheet::backdrop {
+  background: rgb(0 0 0 / 0.6);
+}
+dialog.sheet[open] .sheet-panel {
+  animation: sheet-in 320ms var(--ease-out);
+}
+@keyframes sheet-in {
+  from { transform: translate3d(0, 24px, 0); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .marquee-track { animation: none; }
+  .reveal-item, .press, .lineup-item { transition: none !important; }
+  [data-reveal="pending"] .reveal-item { opacity: 1; transform: none; }
+  dialog.sheet[open] .sheet-panel { animation: none; }
+}
