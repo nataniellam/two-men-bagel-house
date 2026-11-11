@@ -3,6 +3,7 @@ import { Anton, Courier_Prime } from "next/font/google";
 import "./globals.css";
 import SiteChrome from "@/components/SiteChrome";
 import SiteFooter from "@/components/SiteFooter";
+import BagelBoys from "@/components/bagel-boys/BagelBoys";
 
 const anton = Anton({ weight: "400", subsets: ["latin"], variable: "--font-anton", display: "swap" });
 const courierPrime = Courier_Prime({
@@ -35,6 +36,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         </a>
         <SiteChrome />
         <main id="main">{children}</main>
+        <BagelBoys />
         <SiteFooter />
       </body>
     </html>

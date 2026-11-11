@@ -144,10 +144,109 @@ dialog.sheet[open] .sheet-panel {
   to { transform: none; opacity: 1; }
 }
 
+/* Bagel boys (components/bagel-boys): a zero-height sticky strip just above the footer.
+   It rides the bottom of the viewport (above the phone bar) and parks on the footer's top
+   edge. The pair moves with a transform set from script; parts animate by state. */
+.bagel-boys {
+  position: sticky;
+  bottom: calc(var(--bar-h) + env(safe-area-inset-bottom));
+  height: 0;
+  z-index: 30;
+  pointer-events: none;
+}
+@media (min-width: 768px) {
+  .bagel-boys { bottom: 0; }
+}
+.bagel-boys-pair {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  display: flex;
+  align-items: flex-end;
+  /* Room for the right boy's raised wave arm to clear the left boy's coffee */
+  gap: 30px;
+  will-change: transform;
+}
+@media (min-width: 768px) {
+  .bagel-boys-pair { gap: 44px; }
+}
+.bagel-boy {
+  height: 88px;
+}
+@media (min-width: 768px) {
+  .bagel-boy { height: 120px; }
+}
+.bagel-boy svg {
+  display: block;
+  height: 100%;
+  width: auto;
+  overflow: visible;
+}
+.bagel-boys g { transform-box: view-box; }
+/* White backing behind each part, so the black art reads on dark sections */
+.bagel-boys .bb-back { fill: var(--paper); }
+
+/* Face the way they walk: the left boy faces right and the right boy faces left */
+.bagel-boys[data-state="walking"][data-dir="right"] .bagel-boy--right,
+.bagel-boys[data-state="walking"][data-dir="left"] .bagel-boy--left {
+  transform: scaleX(-1);
+}
+
+/* Waddle: each leg lifts in turn while the body bobs */
+@keyframes bb-step-a {
+  0%, 50%, 100% { transform: none; }
+  25% { transform: translateY(-70px) rotate(6deg); }
+}
+@keyframes bb-step-b {
+  0%, 50%, 100% { transform: none; }
+  75% { transform: translateY(-70px) rotate(-6deg); }
+}
+@keyframes bb-bob {
+  0%, 50%, 100% { transform: none; }
+  25% { transform: translateY(-28px) rotate(-1.5deg); }
+  75% { transform: translateY(-28px) rotate(1.5deg); }
+}
+@keyframes bb-sway {
+  0%, 100% { transform: rotate(-4deg); }
+  50% { transform: rotate(4deg); }
+}
+.bagel-boys[data-state="walking"] :is(.left-leg-back, .right-leg-back) { animation: bb-step-a 0.6s linear infinite; }
+.bagel-boys[data-state="walking"] :is(.left-leg-front, .right-leg-front) { animation: bb-step-b 0.6s linear infinite; }
+.bagel-boys[data-state="walking"] :is(#left, #right) { animation: bb-bob 0.6s ease-in-out infinite; transform-origin: 50% 100%; }
+.bagel-boys[data-state="walking"] :is(.left-arm-cigarette, .right-arm-wave) { animation: bb-sway 0.6s ease-in-out infinite; }
+
+/* Wave hello; the left boy raises his coffee */
+@keyframes bb-wave {
+  0%, 100% { transform: none; }
+  20% { transform: rotate(155deg); }
+  35% { transform: rotate(140deg); }
+  50% { transform: rotate(165deg); }
+  65% { transform: rotate(140deg); }
+  80% { transform: rotate(155deg); }
+}
+@keyframes bb-cheers {
+  0%, 100% { transform: none; }
+  25%, 75% { transform: rotate(-16deg); }
+}
+.bagel-boys[data-state="waving"] .right-arm-wave { animation: bb-wave 2.4s ease-in-out both; }
+.bagel-boys[data-state="waving"] .left-arm-coffee { animation: bb-cheers 2.4s ease-in-out both; }
+
+/* Smoke drifts up from the cigarette */
+@keyframes bb-smoke {
+  0%, 100% { transform: none; opacity: 1; }
+  50% { transform: translate(-12px, -60px) scale(1.12); opacity: 0.55; }
+}
+.bagel-boys:not([data-state="static"]) .left-smoke { animation: bb-smoke 3.2s ease-in-out infinite; }
+.bagel-boys[data-paused="true"] * { animation-play-state: paused !important; }
+
+/* Reduced motion: standing still in the right-hand corner */
+.bagel-boys[data-state="static"] .bagel-boys-pair { left: auto; right: 16px; transform: none !important; }
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .marquee-track { animation: none; }
   .reveal-item, .press, .lineup-item { transition: none !important; }
   [data-reveal="pending"] .reveal-item { opacity: 1; transform: none; }
   dialog.sheet[open] .sheet-panel { animation: none; }
+  .bagel-boys * { animation: none !important; }
 }
