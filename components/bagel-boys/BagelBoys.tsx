@@ -7,6 +7,9 @@ type State = "walking" | "waving" | "idle" | "static";
 
 const SPEED = 70; // px per second
 const WAVE_MS = 2400;
+// Rest after a wave before strolling on: a short random beat, shorter after a cursor wave
+const REST_MS = [400, 1000];
+const REST_AFTER_CURSOR_MS = 400;
 const EDGE = 16;
 
 // The bagel boys stroll along the bottom of the screen, stop, wave (the right one waves, the
@@ -81,14 +84,14 @@ export default function BagelBoys() {
       }, WAVE_MS);
     };
 
-    const arrive = () => wave(2000 + Math.random() * 3000);
+    const arrive = () => wave(REST_MS[0] + Math.random() * (REST_MS[1] - REST_MS[0]));
 
     // Cursor close by: stop and wave, at most every 8 seconds
     const onMove = (e: MouseEvent) => {
       if (el.dataset.state !== "walking" || performance.now() - lastWave < 8000) return;
       const r = p.getBoundingClientRect();
       if (e.clientX > r.left - 100 && e.clientX < r.right + 100 && e.clientY > r.top - 100 && e.clientY < r.bottom + 40) {
-        wave(1500);
+        wave(REST_AFTER_CURSOR_MS);
       }
     };
 
